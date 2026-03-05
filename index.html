@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UUV Configurator V3</title>
+    <title>UUV Configurator V4</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <style>
         * {
             margin: 0;
@@ -366,7 +366,7 @@
     <div class="container">
         <header>
             <h1>UUV CONFIGURATOR</h1>
-            <p class="subtitle">UNDERWATER DRONE CONFIGURATION SYSTEM V3</p>
+            <p class="subtitle">UNDERWATER DRONE CONFIGURATION SYSTEM V4</p>
         </header>
 
         <!-- Base Model Selection -->
@@ -478,9 +478,9 @@
                     <h3>PPT Copper</h3>
                     <p>40m, 100m, 300m</p>
                 </div>
-                <div class="item-card" data-tether="2-Wire Copper" onclick="selectTether(this)">
-                    <img src="images/Expeditionary_2_Wire_Copper.JPG" alt="2-Wire Copper">
-                    <h3>2-Wire Copper</h3>
+                <div class="item-card" data-tether="Expeditionary Tether Reel + 550m 2 Wire Copper" onclick="selectTether(this)">
+                    <img src="images/Expeditionary_2_Wire_Copper.JPG" alt="Expeditionary Tether Reel + 550m 2 Wire Copper">
+                    <h3>Expeditionary Tether Reel + 550m 2 Wire Copper</h3>
                 </div>
                 <div class="item-card" data-tether="Extended TDS" onclick="selectTether(this)">
                     <img src="images/Extended_TDS.JPG" alt="Extended TDS">
@@ -490,6 +490,10 @@
                 <div class="item-card" data-tether="Negative Tether" onclick="selectTether(this)">
                     <img src="images/Negative_Tether.jpg" alt="Negative Tether">
                     <h3>Negative Tether</h3>
+                </div>
+                <div class="item-card" data-tether="Tether Bag Backpack" onclick="selectTether(this)">
+                    <img src="images/Tether_Bag_Backpack.jpg" alt="Tether Bag Backpack">
+                    <h3>Tether Bag Backpack</h3>
                 </div>
             </div>
             <div class="input-group" style="margin-top: 20px;">
@@ -539,7 +543,7 @@
 
         <!-- Section 6: Auxiliary Floatation -->
         <div class="section">
-            <h2>6. Auxiliary Floatation</h2>
+            <h2>6. Floatation</h2>
             <div class="grid" id="floatationGrid"></div>
         </div>
 
@@ -663,7 +667,7 @@ const accessories = {
         {
             name: 'Eddyfi 2 Function Manip',
             image: 'Eddyfi_2_Function_Manip.JPG',
-            partNumber: 'EF-2FUNC',
+            partNumber: '70824',
             specs: {
                 depthRating: '1000m',
                 communication: 'RS485',
@@ -677,7 +681,7 @@ const accessories = {
         {
             name: 'Blueprint Oculus M750d',
             image: 'Oculus_M750d_Sonar.JPG',
-            partNumber: 'BP-M750D',
+            partNumber: '71047',
             specs: {
                 depthRating: '500m',
                 communication: 'Ethernet',
@@ -821,7 +825,7 @@ const accessories = {
         {
             name: 'Oculus MT750d',
             image: 'Oculus_MT750d_Sonar.JPG',
-            partNumber: 'BP-MT750D',
+            partNumber: '72346',
             specs: {
                 depthRating: '1000m',
                 communication: 'Ethernet',
@@ -959,7 +963,7 @@ const accessories = {
         {
             name: 'BP Seatrac USBL 300m',
             image: 'BP_Seatrac_USBL_300m.JPG',
-            partNumber: 'BP-ST-300',
+            partNumber: '71162',
             isUSBL: true,
             specs: {
                 depthRating: '300m',
@@ -985,7 +989,7 @@ const accessories = {
         {
             name: 'Vehicle GPS',
             image: 'GPS.JPG',
-            partNumber: 'PN-GPS',
+            partNumber: '70809',
             specs: {
                 depthRating: '1000m',
                 communication: 'Ethernet',
@@ -997,7 +1001,7 @@ const accessories = {
         {
             name: 'Navigation Package',
             image: 'Navigation_Package.png',
-            partNumber: 'PN-NAVPKG',
+            partNumber: '71042',
             hasDepthOptions: true,
             options: [
                 {
@@ -1095,7 +1099,7 @@ const accessories = {
         {
             name: 'Impact Subsea FMD',
             image: 'Impact_Subsea_FMD.JPG',
-            partNumber: 'IS-FMD',
+            partNumber: '72374',
             hasDepthOptions: true,
             options: [
                 {
@@ -1123,7 +1127,7 @@ const accessories = {
         {
             name: 'Cyclone CP Probe',
             image: 'Cyclone_CP_Probe.JPG',
-            partNumber: 'CY-CP',
+            partNumber: '73355',
             specs: {
                 depthRating: '500m',
                 communication: 'RS232 / RS485',
@@ -1135,7 +1139,7 @@ const accessories = {
         {
             name: 'Cygnus UT Thickness Gauge',
             image: 'Cygnus_UT_Gauge.JPG',
-            partNumber: 'CY-UT',
+            partNumber: '71873',
             specs: {
                 depthRating: '500m',
                 communication: 'RS-422',
@@ -1171,15 +1175,15 @@ const accessories = {
             }
         },
         {
-            name: 'EOD Disruptor',
+            name: 'Atlantas Tornado System T-300 w/ Defender Kit',
             image: 'icon.jpg',
-            partNumber: 'EOD-DISRUPT',
+            partNumber: '75819',
             specs: {
-                depthRating: '300m',
-                communication: 'RS485',
+                depthRating: 'TBD',
+                communication: 'TBD',
                 dryWeight: 'TBD',
                 wetWeight: 'TBD',
-                keySpec: 'Remote disruptor'
+                keySpec: 'Atlantas Tornado T-300 system with Defender kit'
             }
         },
         {
@@ -1259,6 +1263,18 @@ const accessories = {
             }
         },
         {
+            name: 'MS Defender Compact Spares Kit',
+            image: 'MS_Defender_Compact_Spares_Kit.jpg',
+            partNumber: '75206',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender compact spares kit'
+            }
+        },
+        {
             name: '2 to 1 Ethernet Hub Cable',
             image: '2_to_1_Ethernet_Hub_Cable.jpg',
             partNumber: '73251',
@@ -1268,6 +1284,18 @@ const accessories = {
                 dryWeight: 'TBD',
                 wetWeight: 'TBD',
                 keySpec: '2-to-1 Ethernet hub cable'
+            }
+        },
+        {
+            name: 'MS Defender Compact Spares Kit',
+            image: 'MS_Defender_Compact_Spares_Kit.jpg',
+            partNumber: '75206',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Compact spares kit for Defender'
             }
         }
     ],
@@ -1342,6 +1370,30 @@ const accessories = {
                 dryWeight: 'TBD',
                 wetWeight: '-3.0kg',
                 keySpec: '3 kg buoyancy, Defender 2km'
+            }
+        },
+        {
+            name: 'Defender Float Block 2km',
+            image: 'Defender_Float_Block_2km.jpg',
+            partNumber: '71028',
+            specs: {
+                depthRating: '2000m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender 2km float block'
+            }
+        },
+        {
+            name: 'Defender Module Spares Kit',
+            image: 'icon.jpg',
+            partNumber: '71532',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender module spares kit'
             }
         }
     ]
@@ -1754,7 +1806,7 @@ const accessories = {
                     <div class="bom-item">
                         <div>
                             <div class="name">Base Model: ${selectedBaseModel}</div>
-                            <div class="details">Part #: PN-BASE-${selectedBaseModel.replace(' ', '')}</div>
+                            <div class="details">Part #: ${ {'Defender': '73421', 'Pro 5': 'PN-PRO5', 'Ally': 'PN-ALLY', 'Wraith': 'PN-WRAITH', 'Defender + Ally Combo': 'PN-DEFALLY'}[selectedBaseModel] || 'TBD' }</div>
                         </div>
                     </div>
                 `;
@@ -1766,7 +1818,7 @@ const accessories = {
                     <div class="bom-item">
                         <div>
                             <div class="name">Topside Controller: ${selectedController}</div>
-                            <div class="details">Part #: PN-CTRL-${selectedController.toUpperCase()}</div>
+                            <div class="details">Part #: ${ {'Splashproof': '73394', 'Workhorse': 'PN-WORKHORSE', 'Expeditionary': 'PN-EXPED', 'PPS': '71850'}[selectedController] || 'TBD' }</div>
                         </div>
                     </div>
                 `;
@@ -1814,7 +1866,7 @@ const accessories = {
                     <div class="bom-item">
                         <div>
                             <div class="name">Tether: ${selectedTether}${lengthText}</div>
-                            <div class="details">Part #: PN-TETHER-${selectedTether.replace(/[- ]/g, '').toUpperCase()}</div>
+                            <div class="details">Part #: ${ (function(){ if (selectedTether === 'PPT Copper') { var len = document.getElementById('tetherLength').value; if (len === '100m (Copper)') return '72036'; if (len === '300m (Copper)') return '71997'; return 'PN-PPT'; } return {'Extended TDS': '70452', 'Fiber': 'PN-FIBER', 'Hybrid': 'PN-HYBRID', 'Expeditionary Tether Reel + 550m 2 Wire Copper': '72743', 'Negative Tether': 'PN-NEGTETHER', 'Tether Bag Backpack': '50240'}[selectedTether] || 'TBD'; })() }</div>
                         </div>
                     </div>
                 `;
@@ -1857,7 +1909,7 @@ const accessories = {
             // Add base model
             exportData.push({
                 'Item No.': itemNo++,
-                'Part Number': `PN-BASE-${selectedBaseModel.replace(' ', '')}`,
+                'Part Number': {'Defender': '73421', 'Pro 5': 'PN-PRO5', 'Ally': 'PN-ALLY', 'Wraith': 'PN-WRAITH', 'Defender + Ally Combo': 'PN-DEFALLY'}[selectedBaseModel] || `PN-BASE-${selectedBaseModel.replace(' ', '')}`,
                 'Description': `Base Model: ${selectedBaseModel}`,
                 'Quantity': 1,
                 'Depth Rating': 'N/A',
@@ -1871,7 +1923,7 @@ const accessories = {
             if (selectedController) {
                 exportData.push({
                     'Item No.': itemNo++,
-                    'Part Number': `PN-CTRL-${selectedController.toUpperCase()}`,
+                    'Part Number': {'Splashproof': '73394', 'Workhorse': 'PN-WORKHORSE', 'Expeditionary': 'PN-EXPED', 'PPS': '71850'}[selectedController] || `PN-CTRL-${selectedController.toUpperCase()}`,
                     'Description': `Topside Controller: ${selectedController}`,
                     'Quantity': 1,
                     'Depth Rating': 'N/A',
@@ -1926,9 +1978,15 @@ const accessories = {
                 const customLength = document.getElementById('customTetherLength').value;
                 const tetherLength = tetherLengthSelect === 'Custom' && customLength ? `Custom: ${customLength}` : (tetherLengthSelect && tetherLengthSelect !== 'Custom' ? tetherLengthSelect : '');
                 const lengthText = tetherLength ? ` - ${tetherLength}` : '';
+                
+                // PPT Copper length-specific part numbers
+                let tetherPN = {'Extended TDS': '70452', 'Fiber': 'PN-FIBER', 'Hybrid': 'PN-HYBRID', 'PPT Copper': 'PN-PPT', 'Expeditionary Tether Reel + 550m 2 Wire Copper': '72743', 'Negative Tether': 'PN-NEGTETHER', 'Tether Bag Backpack': '50240'}[selectedTether] || 'TBD';
+                if (selectedTether === 'PPT Copper' && tetherLengthSelect === '100m (Copper)') tetherPN = '72036';
+                if (selectedTether === 'PPT Copper' && tetherLengthSelect === '300m (Copper)') tetherPN = '71997';
+                
                 exportData.push({
                     'Item No.': itemNo++,
-                    'Part Number': `PN-TETHER-${selectedTether.replace(/[- ]/g, '').toUpperCase()}`,
+                    'Part Number': tetherPN,
                     'Description': `Tether: ${selectedTether}${lengthText}`,
                     'Quantity': 1,
                     'Depth Rating': 'TBD',
@@ -1973,38 +2031,57 @@ const accessories = {
             ];
             ws['!cols'] = colWidths;
 
-            // Apply styles: gray header with bold text and borders on all cells
-            // Note: Free SheetJS doesn't support styles in .xlsx export
-            // Using HTML table export for styled output
-            let htmlTable = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>BOM</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>';
+            // Build styled worksheet using xlsx-js-style
+            const headers = ['Item No.', 'Part Number', 'Description', 'Quantity', 'Depth Rating', 'Communication', 'Dry Weight', 'Wet Weight', 'Key Specification'];
+            
+            const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+            const border = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+            
+            // Header style
+            const headerStyle = {
+                font: { bold: true },
+                fill: { fgColor: { rgb: 'D9D9D9' } },
+                border: border
+            };
+            
+            // Data cell style
+            const cellStyle = {
+                border: border
+            };
+
+            // Build array of arrays with styles
+            const aoa = [];
             
             // Header row
-            const headers = ['Item No.', 'Part Number', 'Description', 'Quantity', 'Depth Rating', 'Communication', 'Dry Weight', 'Wet Weight', 'Key Specification'];
-            htmlTable += '<tr>';
-            headers.forEach(h => {
-                htmlTable += `<th style="background-color:#D9D9D9; font-weight:bold; border:1px solid #000; padding:4px;">${h}</th>`;
-            });
-            htmlTable += '</tr>';
-
+            aoa.push(headers.map(h => ({ v: h, t: 's', s: headerStyle })));
+            
             // Data rows
             exportData.forEach(row => {
-                htmlTable += '<tr>';
-                headers.forEach(h => {
-                    htmlTable += `<td style="border:1px solid #000; padding:4px;">${row[h] !== undefined ? row[h] : ''}</td>`;
-                });
-                htmlTable += '</tr>';
+                aoa.push(headers.map(h => {
+                    const val = row[h] !== undefined ? row[h] : '';
+                    return { v: val, t: typeof val === 'number' ? 'n' : 's', s: cellStyle };
+                }));
             });
 
-            htmlTable += '</table></body></html>';
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'BOM');
 
-            // Download as .xls (Excel will open it with styles)
-            const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'UUV_BOM.xls';
-            a.click();
-            URL.revokeObjectURL(url);
+            // Auto-size columns
+            ws['!cols'] = [
+                { wch: 10 },  // Item No.
+                { wch: 20 },  // Part Number
+                { wch: 40 },  // Description
+                { wch: 10 },  // Quantity
+                { wch: 15 },  // Depth Rating
+                { wch: 25 },  // Communication
+                { wch: 15 },  // Dry Weight
+                { wch: 15 },  // Wet Weight
+                { wch: 30 }   // Key Specification
+            ];
+
+            // Export as proper .xlsx
+            XLSX.writeFile(wb, 'UUV_BOM.xlsx');
         }
 
         // Initialize on page load
