@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUV Configurator V4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
+            color: #e0e7ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s linear infinite;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #94a3b8;
+            letter-spacing: 3px;
+        }
+
+        .section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #60a5fa;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .item-card:hover::before {
+            left: 100%;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .item-card.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+        }
+
+        .item-card h3 {
+            font-size: 1em;
+            margin-bottom: 5px;
+            color: #e0e7ff;
+            font-weight: 600;
+        }
+
+        .item-card p {
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #60a5fa;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            color: #e0e7ff;
+            font-size: 1em;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .bom-summary {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .bom-summary h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        .bom-item {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bom-item .name {
+            font-weight: 600;
+            color: #e0e7ff;
+        }
+
+        .bom-item .details {
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 20px;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .modal-btn.secondary {
+            background: #475569;
+            color: white;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #334155;
+        }
+
+        .warning-text {
+            color: #fbbf24;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .spec-table th {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .spec-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            color: #e0e7ff;
+        }
+
+        .spec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UUV CONFIGURATOR</h1>
+            <p class="subtitle">UNDERWATER DRONE CONFIGURATION SYSTEM V4</p>
+        </header>
+
+        <!-- Base Model Selection -->
+        <div class="section">
+            <h2>1. Select Base Model</h2>
+            <div class="grid" id="baseModelGrid">
+                <div class="item-card" data-model="Pro 5" onclick="selectBaseModel(this)">
+                    <img src="images/Pro_5.JPG" alt="Pro 5">
+                    <h3>Pro 5</h3>
+                </div>
+                <div class="item-card" data-model="Defender" onclick="selectBaseModel(this)">
+                    <img src="images/Defender.JPG" alt="Defender">
+                    <h3>Defender</h3>
+                    <p>73421</p>
+                </div>
+                <div class="item-card" data-model="Ally" onclick="selectBaseModel(this)">
+                    <img src="images/Ally.JPG" alt="Ally">
+                    <h3>Ally</h3>
+                </div>
+                <div class="item-card" data-model="Wraith" onclick="selectBaseModel(this)">
+                    <img src="images/Wraith.JPG" alt="Wraith">
+                    <h3>Wraith</h3>
+                </div>
+                <div class="item-card" data-model="Defender + Ally Combo" onclick="selectBaseModel(this)">
+                    <img src="images/Defender_Ally_Combo.jpg" alt="Defender + Ally Combo">
+                    <h3>Defender + Ally Combo</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topside Controller Selection -->
+        <div class="section">
+            <h2>2. Select Topside Controller & Power</h2>
+            <div class="grid" id="controllerGrid">
+                <div class="item-card" data-controller="Workhorse" onclick="selectController(this)">
+                    <img src="images/WorkHorse_Controller.JPG" alt="Workhorse">
+                    <h3>Workhorse</h3>
+                </div>
+                <div class="item-card" data-controller="Splashproof" onclick="selectController(this)">
+                    <img src="images/Splashproof_Controller.JPG" alt="Splashproof">
+                    <h3>Splashproof</h3>
+                </div>
+                <div class="item-card" data-controller="Expeditionary" onclick="selectController(this)">
+                    <img src="images/Expeditionary_Merged.jpg" alt="Expeditionary">
+                    <h3>Expeditionary</h3>
+                </div>
+                <div class="item-card" data-controller="PPS" onclick="selectController(this)">
+                    <img src="images/PPS.JPG" alt="Portable Power Supply">
+                    <h3>Portable Power Supply</h3>
+                </div>
+            </div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Vehicle Battery Set</h3>
+            <div class="grid" id="batteryGrid">
+                <div class="item-card" data-battery="NiMH 300m" data-pn="72739" onclick="selectBattery(this)">
+                    <img src="images/Vehicle_Battery_Set_NiMH_-_300m.JPG" alt="NiMH 300m">
+                    <h3>NiMH - 300m</h3>
+                    <p>PN: 72739</p>
+                </div>
+                <div class="item-card" data-battery="NiMH 1000m" data-pn="73501" onclick="selectBattery(this)">
+                    <img src="images/Vehicle_Battery_Set_NiMH_-_1000m.JPG" alt="NiMH 1000m">
+                    <h3>NiMH - 1000m</h3>
+                    <p>PN: 73501</p>
+                </div>
+                <div class="item-card" data-battery="Li-Ion 300m" data-pn="73133" onclick="selectBattery(this)">
+                    <img src="images/Vehicle_Battery_Set_Li-Ion_-_300m.JPG" alt="Li-Ion 300m">
+                    <h3>Li-Ion - 300m</h3>
+                    <p>PN: 73133</p>
+                </div>
+                <div class="item-card" data-battery="Li-Ion 1000m" data-pn="73502" onclick="selectBattery(this)">
+                    <img src="images/Vehicle_Battery_Set_Li-Ion_-_1000m.JPG" alt="Li-Ion 1000m">
+                    <h3>Li-Ion - 1000m</h3>
+                    <p>PN: 73502</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Software Selection -->
+        <div class="section">
+            <h2>3. Select Control Software</h2>
+            <div class="grid" id="softwareGrid">
+                <div class="item-card" data-software="Greensea" onclick="selectSoftware(this)">
+                    <img src="images/Greensea.JPG" alt="Greensea">
+                    <h3>Greensea</h3>
+                </div>
+                <div class="item-card" data-software="VideoRay" onclick="selectSoftware(this)">
+                    <img src="images/VideoRay_Software.JPG" alt="VideoRay">
+                    <h3>VideoRay</h3>
+                </div>
+            </div>
+            <input type="hidden" id="software" value="">
+        </div>
+
+        <!-- Tether Selection -->
+        <div class="section">
+            <h2>4. Select Tether</h2>
+            <div class="grid" id="tetherGrid">
+                <div class="item-card" data-tether="Fiber" onclick="selectTether(this)">
+                    <img src="images/Fiber_Tether.JPG" alt="Fiber">
+                    <h3>Fiber Tether</h3>
+                    <p>1500m standard</p>
+                </div>
+                <div class="item-card" data-tether="Hybrid" onclick="selectTether(this)">
+                    <img src="images/Hybrid_Tether.JPG" alt="Hybrid">
+                    <h3>Hybrid Tether</h3>
+                    <p>600m max</p>
+                </div>
+                <div class="item-card" data-tether="PPT Copper" onclick="selectTether(this)">
+                    <img src="images/PPT_Tether.JPG" alt="PPT Copper">
+                    <h3>PPT Copper</h3>
+                    <p>40m, 100m, 300m</p>
+                </div>
+                <div class="item-card" data-tether="Expeditionary Tether Reel + 550m 2 Wire Copper" onclick="selectTether(this)">
+                    <img src="images/Expeditionary_2_Wire_Copper.JPG" alt="Expeditionary Tether Reel + 550m 2 Wire Copper">
+                    <h3>Expeditionary Tether Reel + 550m 2 Wire Copper</h3>
+                </div>
+                <div class="item-card" data-tether="Extended TDS" onclick="selectTether(this)">
+                    <img src="images/Extended_TDS.JPG" alt="Extended TDS">
+                    <h3>Extended TDS</h3>
+                    <p>Tether Deployment System</p>
+                </div>
+                <div class="item-card" data-tether="Negative Tether" onclick="selectTether(this)">
+                    <img src="images/Negative_Tether.jpg" alt="Negative Tether">
+                    <h3>Negative Tether</h3>
+                </div>
+                <div class="item-card" data-tether="Tether Bag Backpack" onclick="selectTether(this)">
+                    <img src="images/Tether_Bag_Backpack.jpg" alt="Tether Bag Backpack">
+                    <h3>Tether Bag Backpack</h3>
+                </div>
+            </div>
+            <div class="input-group" style="margin-top: 20px;">
+                <label for="tetherLength">Tether Length:</label>
+                <select id="tetherLength">
+                    <option value="">-- Select Length --</option>
+                    <option value="40m (Copper)">40m (Copper)</option>
+                    <option value="100m (Copper)">100m (Copper)</option>
+                    <option value="300m (Copper)">300m (Copper)</option>
+                    <option value="550m (Expeditionary 2-Wire Copper)">550m (Expeditionary 2-Wire Copper)</option>
+                    <option value="600m (Hybrid Max)">600m (Hybrid Max)</option>
+                    <option value="1500m (Fiber)">1500m (Fiber)</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+            <div class="input-group" id="customLengthGroup" style="margin-top: 10px; display: none;">
+                <label for="customTetherLength">Enter Custom Length:</label>
+                <input type="text" id="customTetherLength" placeholder="e.g. 250m" oninput="updateCustomTetherLength()">
+            </div>
+        </div>
+
+        <!-- Accessories -->
+        <div class="section">
+            <h2>5. Select Accessories</h2>
+            
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Manipulators</h3>
+            <div class="grid" id="manipulatorGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Sonars</h3>
+            <div class="grid" id="sonarGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Cameras</h3>
+            <div class="grid" id="cameraGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Navigation</h3>
+            <div class="grid" id="navigationGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">NDT</h3>
+            <div class="grid" id="ndtGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">EOD (Explosive Ordnance Disposal)</h3>
+            <div class="grid" id="eodGrid"></div>
+
+            <h3 style="color: #60a5fa; margin: 20px 0 10px 0;">Uncategorized</h3>
+            <div class="grid" id="uncategorizedGrid"></div>
+        </div>
+
+        <!-- Section 6: Auxiliary Floatation -->
+        <div class="section">
+            <h2>6. Floatation</h2>
+            <div class="grid" id="floatationGrid"></div>
+        </div>
+
+        <!-- BOM Summary -->
+        <div class="bom-summary">
+            <h2>Bill of Materials (BOM)</h2>
+            <div id="bomList"></div>
+            <button class="export-btn" onclick="exportToExcel()">EXPORT TO EXCEL</button>
+        </div>
+    </div>
+
+    <!-- Spec Modal -->
+    <div id="specModal" class="modal">
+        <div class="modal-content">
+            <h3 id="specModalTitle">Accessory Specifications</h3>
+            <table class="spec-table" id="specTable">
+                <tr>
+                    <th>Specification</th>
+                    <th>Value</th>
+                </tr>
+            </table>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeSpecModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="addToBOMFromModal()">Add to BOM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for depth rating selection -->
+    <div id="depthModal" class="modal">
+        <div class="modal-content">
+            <h3>Select Depth Rating</h3>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn primary" id="option1Btn"></button>
+                <button class="modal-btn primary" id="option2Btn"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for tether replacement -->
+    <div id="tetherModal" class="modal">
+        <div class="modal-content">
+            <h3>Tether Replacement</h3>
+            <p>The Voyis Stereo Camera requires a Fiber Tether.</p>
+            <p class="warning-text">Would you like to replace the existing Copper tether with Fiber, or add Fiber in addition to Copper?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeTetherModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="replaceTether()">Replace with Fiber</button>
+                <button class="modal-btn primary" onclick="addFiberTether()">Add Fiber</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration data
+// Complete accessories database with full specifications
+const accessories = {
+    manipulators: [
+        {
+            name: 'REACH Bravo 2',
+            image: 'REACH_Bravo_2_Function.JPG',
+            partNumber: 'RB-2130',
+            specs: {
+                depthRating: '500m',
+                communication: 'Ethernet',
+                dryWeight: '1.8kg',
+                wetWeight: '0.16kg',
+                keySpec: '5-function, 24V/48V'
+            }
+        },
+        {
+            name: 'REACH Dual X7s (AIS)',
+            image: 'Dual_REACH_X7__AIS_.JPG',
+            partNumber: 'RX7-DUAL',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Dual 7-function arms'
+            }
+        },
+        {
+            name: 'REACH Alpha 2',
+            image: 'REACH_Alpha_2.JPG',
+            partNumber: 'RA-2130',
+            specs: {
+                depthRating: '500m',
+                communication: 'RS485',
+                dryWeight: '0.28kg',
+                wetWeight: '0.24kg',
+                keySpec: '2-function gripper'
+            }
+        },
+        {
+            name: 'REACH Alpha 5',
+            image: 'REACH_Alpha_5.JPG',
+            partNumber: 'RA-5000',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: '5-function manipulator'
+            }
+        },
+        {
+            name: 'REACH X5',
+            image: 'REACH_X5.jpg',
+            partNumber: 'RX-5XXX',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: '2.3kg',
+                wetWeight: '1.6kg',
+                keySpec: '5-function, 25kg grab force, 3kg lift'
+            }
+        },
+        {
+            name: 'Eddyfi 2 Function Manip',
+            image: 'Eddyfi_2_Function_Manip.JPG',
+            partNumber: '70824',
+            specs: {
+                depthRating: '1000m',
+                communication: 'RS485',
+                dryWeight: '0.85kg',
+                wetWeight: '0.73kg',
+                keySpec: '2-function gripper'
+            }
+        }
+    ],
+    sonars: [
+        {
+            name: 'Blueprint Oculus M750d',
+            image: 'Oculus_M750d_Sonar.JPG',
+            partNumber: '71047',
+            specs: {
+                depthRating: '500m',
+                communication: 'Ethernet',
+                dryWeight: '0.98kg',
+                wetWeight: '0.36kg',
+                keySpec: '750kHz / 1.2MHz dual freq, 120m/40m range, 1°/0.6° res, 512 beams'
+            }
+        },
+        {
+            name: 'Blueprint Oculus M1200d',
+            image: 'Oculus_M750d_Sonar.JPG',
+            partNumber: 'BP-M1200D',
+            specs: {
+                depthRating: '500m',
+                communication: 'Ethernet',
+                dryWeight: '0.98kg',
+                wetWeight: '0.36kg',
+                keySpec: '1.2MHz / 2.1MHz dual freq, 40m/10m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Blueprint Oculus M3000d',
+            image: 'Oculus_M750d_Sonar.JPG',
+            partNumber: 'BP-M3000D',
+            specs: {
+                depthRating: '500m',
+                communication: 'Ethernet',
+                dryWeight: '0.98kg',
+                wetWeight: '0.36kg',
+                keySpec: '1.2MHz / 3.0MHz dual freq, 30m/5m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Tritech Gemini 720iks',
+            image: 'Tritech_Gemini_720iks.jpg',
+            partNumber: 'TT-G720IKS',
+            specs: {
+                depthRating: '350m',
+                communication: 'Ethernet',
+                dryWeight: '1.40kg',
+                wetWeight: '0.43kg',
+                keySpec: '720kHz, 120° FOV, 120m range, 0.25° res, CHIRP, 97Hz update'
+            }
+        },
+        {
+            name: 'Tritech Gemini 720is',
+            image: 'Tritech_Gemini_720is.jpg',
+            partNumber: 'TT-G720IS',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '1000m',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet',
+                        dryWeight: '2.03kg',
+                        wetWeight: '0.92kg',
+                        keySpec: '720kHz, 120° FOV, 120m range, 0.25° res, CHIRP'
+                    }
+                },
+                {
+                    depth: '4000m',
+                    specs: {
+                        depthRating: '4000m',
+                        communication: 'Ethernet',
+                        dryWeight: '5.0kg',
+                        wetWeight: '3.0kg',
+                        keySpec: '720kHz, 120° FOV, 120m range, 0.25° res, CHIRP'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Tritech Gemini 1200ikd',
+            image: 'Tritech_Gemini_1200ikd.jpg',
+            partNumber: 'TT-G1200IKD',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '500m',
+                    specs: {
+                        depthRating: '500m',
+                        communication: 'Ethernet',
+                        dryWeight: '1.46kg',
+                        wetWeight: '0.44kg',
+                        keySpec: '720kHz/1200kHz dual freq, 120° FOV, 120m/50m range, 0.12° res'
+                    }
+                },
+                {
+                    depth: '1000m',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet',
+                        dryWeight: '2.03kg',
+                        wetWeight: '0.92kg',
+                        keySpec: '720kHz/1200kHz dual freq, 120° FOV, 120m/50m range, 0.12° res'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Tritech Gemini 1200id',
+            image: 'Tritech_Gemini_1200id.jpg',
+            partNumber: 'TT-G1200ID',
+            specs: {
+                depthRating: '4000m',
+                communication: 'Ethernet',
+                dryWeight: '5.0kg',
+                wetWeight: '3.0kg',
+                keySpec: '720kHz/1200kHz dual freq, 120° FOV, 120m/50m range, CHIRP'
+            }
+        },
+        {
+            name: 'BlueView M900 MK2',
+            image: 'BlueView_M900_MK2.jpg',
+            partNumber: 'BV-M900MK2',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '1000m',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet',
+                        dryWeight: '2.5kg',
+                        wetWeight: '1.2kg',
+                        keySpec: '900kHz, 130° FOV, 768 beams, 100m max range, 1° beam width'
+                    }
+                },
+                {
+                    depth: '6000m',
+                    specs: {
+                        depthRating: '6000m',
+                        communication: 'Ethernet',
+                        dryWeight: '7.9kg',
+                        wetWeight: '5.2kg',
+                        keySpec: '900kHz, 130° FOV, 768 beams, 100m max range, 1° beam width'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Oculus MT750d',
+            image: 'Oculus_MT750d_Sonar.JPG',
+            partNumber: '72346',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: '1.35kg',
+                wetWeight: '0.73kg',
+                keySpec: '750kHz/1.2MHz dual freq, 120m/40m range, 1°/0.6° res, 512 beams'
+            }
+        },
+        {
+            name: 'Oculus MT1200d',
+            image: 'Oculus_MT750d_Sonar.JPG',
+            partNumber: 'BP-MT1200D',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: '1.35kg',
+                wetWeight: '0.73kg',
+                keySpec: '1.2MHz/2.1MHz dual freq, 40m/10m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Oculus MT3000d',
+            image: 'Oculus_MT750d_Sonar.JPG',
+            partNumber: 'BP-MT3000D',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: '1.35kg',
+                wetWeight: '0.73kg',
+                keySpec: '1.2MHz/3.0MHz dual freq, 30m/5m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Oculus MD750d',
+            image: 'Oculus_MD750d.JPG',
+            partNumber: 'BP-MD750D',
+            specs: {
+                depthRating: '4000m',
+                communication: 'Ethernet',
+                dryWeight: '2.5kg',
+                wetWeight: '1.45kg',
+                keySpec: '750kHz/1.2MHz dual freq, 120m/40m range, 1°/0.6° res, 512 beams'
+            }
+        },
+        {
+            name: 'Oculus MD1200d',
+            image: 'Oculus_MD750d.JPG',
+            partNumber: 'BP-MD1200D',
+            specs: {
+                depthRating: '4000m',
+                communication: 'Ethernet',
+                dryWeight: '2.5kg',
+                wetWeight: '1.45kg',
+                keySpec: '1.2MHz/2.1MHz dual freq, 40m/10m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Oculus MD3000d',
+            image: 'Oculus_MD750d.JPG',
+            partNumber: 'BP-MD3000D',
+            specs: {
+                depthRating: '4000m',
+                communication: 'Ethernet',
+                dryWeight: '2.5kg',
+                wetWeight: '1.45kg',
+                keySpec: '1.2MHz/3.0MHz dual freq, 30m/5m range, 0.6°/0.4° res, 512 beams'
+            }
+        },
+        {
+            name: 'Marine Sonic Arc Scout MKII Side Scan Sonar',
+            image: 'Marine_Sonic_Arc_Scout_MKII_Side_Scan_Sonar.jpg',
+            partNumber: 'MS-ARCSCOUT2',
+            specs: {
+                depthRating: '600m-10000m',
+                communication: 'Ethernet',
+                dryWeight: '0.195kg per unit',
+                wetWeight: 'TBD',
+                keySpec: '150-1800kHz, Adaptive CHIRP, dual simultaneous freq, 0.4cm res'
+            }
+        },
+        {
+            name: 'Blueprint Starfish 992 Side Scan Sonar',
+            image: 'Blueprint_Starfish_992_Side_Scan_Sonar.jpg',
+            partNumber: 'BP-SF992-OEM',
+            specs: {
+                depthRating: '2000m',
+                communication: 'USB',
+                dryWeight: '0.7kg',
+                wetWeight: 'TBD',
+                keySpec: '1MHz CHIRP, 0.3° beam width, 35m range/channel, 60° vertical'
+            }
+        }
+    ],
+    navigation: [
+        {
+            name: 'Nortek DVL500',
+            image: 'Nortek_DVL_500.jpg',
+            partNumber: 'NK-DVL500',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '300m',
+                    specs: {
+                        depthRating: '300m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.35kg',
+                        wetWeight: '0.3kg',
+                        keySpec: '500kHz DVL'
+                    }
+                },
+                {
+                    depth: '6000m',
+                    specs: {
+                        depthRating: '6000m',
+                        communication: 'Ethernet',
+                        dryWeight: '2.0kg',
+                        wetWeight: '1.7kg',
+                        keySpec: '500kHz DVL'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Nortek DVL1000',
+            image: 'Nortek_DVL1000.jpg',
+            partNumber: 'NK-DVL1000',
+            specs: {
+                depthRating: '6000m',
+                communication: 'Ethernet',
+                dryWeight: '4.15kg',
+                wetWeight: '1.7kg',
+                keySpec: '1MHz DVL, 0.1-75m range'
+            }
+        },
+        {
+            name: 'BP Seatrac USBL 300m',
+            image: 'BP_Seatrac_USBL_300m.JPG',
+            partNumber: '71162',
+            isUSBL: true,
+            specs: {
+                depthRating: '300m',
+                communication: 'Power Only',
+                dryWeight: '0.3kg',
+                wetWeight: '0.17kg',
+                keySpec: 'USBL X150/X010 Lightweight, 1km range'
+            }
+        },
+        {
+            name: 'BP Seatrac USBL 2000m',
+            image: 'BP_Seatrac_USBL_2000m.JPG',
+            partNumber: 'BP-ST-2000',
+            isUSBL: true,
+            specs: {
+                depthRating: '2000m',
+                communication: 'Power Only',
+                dryWeight: '0.72kg',
+                wetWeight: '0.53kg',
+                keySpec: 'USBL X150/X110 Standard, 1km range'
+            }
+        },
+        {
+            name: 'Vehicle GPS',
+            image: 'GPS.JPG',
+            partNumber: '70809',
+            specs: {
+                depthRating: '1000m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'GPS receiver'
+            }
+        },
+        {
+            name: 'Navigation Package',
+            image: 'Navigation_Package.png',
+            partNumber: '71042',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '300m',
+                    specs: {
+                        depthRating: '300m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.35kg + TBD',
+                        wetWeight: '0.3kg + TBD',
+                        keySpec: 'Nortek DVL500 + Vehicle GPS bundle'
+                    }
+                },
+                {
+                    depth: '6000m',
+                    specs: {
+                        depthRating: '6000m',
+                        communication: 'Ethernet',
+                        dryWeight: '2.0kg + TBD',
+                        wetWeight: '1.7kg + TBD',
+                        keySpec: 'Nortek DVL500 + Vehicle GPS bundle'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Sonardyne SPRINT-Nav U',
+            image: 'SonarDyne_Sprint_Nav_U.JPG',
+            partNumber: 'SD-SPNAVU',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: '1.98kg',
+                wetWeight: '0.60kg',
+                keySpec: '500kHz DVL, AHRS/DVL/INS/Depth, 0.15° heading, 0.3-100m alt'
+            }
+        },
+        {
+            name: 'Sonardyne SPRINT-Nav Mini',
+            image: 'SonarDyne_Sprint_Nav_Mini.png',
+            partNumber: 'SD-SPNAVMINI',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '300m',
+                    specs: {
+                        depthRating: '300m',
+                        communication: 'Ethernet',
+                        dryWeight: '3.6kg',
+                        wetWeight: '0.7kg',
+                        keySpec: '500kHz DVL, AHRS/DVL/INS/Depth, 0.15° heading, 0.3-200m alt'
+                    }
+                },
+                {
+                    depth: '4000m',
+                    specs: {
+                        depthRating: '4000m',
+                        communication: 'Ethernet',
+                        dryWeight: '7.1kg',
+                        wetWeight: '4.2kg',
+                        keySpec: '500kHz DVL, AHRS/DVL/INS/Depth, 0.15° heading, 0.3-200m alt'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'WaterLinked A125',
+            image: 'WaterLinked_A125.JPG',
+            partNumber: 'WL-A125',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '600m',
+                    specs: {
+                        depthRating: '600m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.75kg',
+                        wetWeight: '0.50kg',
+                        keySpec: '420kHz DVL, 5cm-125m alt, 9m/s max vel, ±1.01% accuracy'
+                    }
+                },
+                {
+                    depth: '4000m',
+                    specs: {
+                        depthRating: '4000m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.75kg',
+                        wetWeight: '0.50kg',
+                        keySpec: '420kHz DVL, 5cm-125m alt, 9m/s max vel, ±1.01% accuracy'
+                    }
+                }
+            ]
+        }
+    ],
+    ndt: [
+        {
+            name: 'Impact Subsea FMD',
+            image: 'Impact_Subsea_FMD.JPG',
+            partNumber: '72374',
+            hasDepthOptions: true,
+            options: [
+                {
+                    depth: '1000m',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'RS485',
+                        dryWeight: '0.13kg',
+                        wetWeight: '0.11kg',
+                        keySpec: 'Flooded Member Detection'
+                    }
+                },
+                {
+                    depth: '6000m',
+                    specs: {
+                        depthRating: '6000m',
+                        communication: 'RS485',
+                        dryWeight: '0.38kg',
+                        wetWeight: '0.325kg',
+                        keySpec: 'Flooded Member Detection'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'Cyclone CP Probe',
+            image: 'Cyclone_CP_Probe.JPG',
+            partNumber: '73355',
+            specs: {
+                depthRating: '500m',
+                communication: 'RS232 / RS485',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Cathodic Protection, ±1mV accuracy'
+            }
+        },
+        {
+            name: 'Cygnus UT Thickness Gauge',
+            image: 'Cygnus_UT_Gauge.JPG',
+            partNumber: '71873',
+            specs: {
+                depthRating: '500m',
+                communication: 'RS-422',
+                dryWeight: '0.55kg',
+                wetWeight: 'TBD',
+                keySpec: 'Ultrasonic thickness, 1-250mm range'
+            }
+        }
+    ],
+    eod: [
+        {
+            name: 'EOD Kit - Basic',
+            image: 'icon.jpg',
+            partNumber: 'EOD-BASIC',
+            specs: {
+                depthRating: '300m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Basic EOD toolset'
+            }
+        },
+        {
+            name: 'EOD Kit - Advanced',
+            image: 'icon.jpg',
+            partNumber: 'EOD-ADV',
+            specs: {
+                depthRating: '300m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Advanced EOD toolset'
+            }
+        },
+        {
+            name: 'Atlantas Tornado System T-300 w/ Defender Kit',
+            image: 'icon.jpg',
+            partNumber: '75819',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'TBD',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Atlantas Tornado T-300 system with Defender kit'
+            }
+        },
+        {
+            name: 'Viper MDS',
+            image: 'Viper_MDS.jpg',
+            partNumber: 'TBD',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'TBD',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'TBD'
+            }
+        }
+    ],
+    cameras: [
+        {
+            name: 'Voyis Discovery 300m',
+            image: 'Voyis_Discovery_300m.JPG',
+            partNumber: 'VY-DISC-300',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: '8.1MP, 4K video, 130°x130° FOV, 125k lumens, 2x Nova Mini'
+            }
+        },
+        {
+            name: 'Voyis Discovery Stereo 300m',
+            image: 'Voyis_Discovery_Stereo_300m.JPG',
+            partNumber: 'VY-STEREO-300',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: '8.1MP stereo, 4K video, 75°x75° FOV, 250k lumens, 1mm 3D res'
+            }
+        },
+        {
+            name: 'Voyis Discovery Stereo 4000m',
+            image: 'Voyis_Discovery_Stereo_4000m.JPG',
+            partNumber: 'VY-STEREO-4000',
+            specs: {
+                depthRating: '4000m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: '8.1MP stereo, 4K video, 75°x75° FOV, 250k lumens, 1mm 3D res'
+            }
+        }
+    ],
+    uncategorized: [
+        {
+            name: 'Defender Laser Scalar',
+            image: 'Defender_Laser_Scalar.jpg',
+            partNumber: '72920',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'TBD',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Laser scalar for Defender'
+            }
+        },
+        {
+            name: 'Serial to Ethernet Cable Assembly',
+            image: 'Serial_to_Ethernet_Cable_Assembly.jpg',
+            partNumber: '74014',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Serial to Ethernet conversion cable'
+            }
+        },
+        {
+            name: 'MS Defender Compact Spares Kit',
+            image: 'MS_Defender_Compact_Spares_Kit.jpg',
+            partNumber: '75206',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender compact spares kit'
+            }
+        },
+        {
+            name: '2 to 1 Ethernet Hub Cable',
+            image: '2_to_1_Ethernet_Hub_Cable.jpg',
+            partNumber: '73251',
+            specs: {
+                depthRating: '300m',
+                communication: 'Ethernet',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: '2-to-1 Ethernet hub cable'
+            }
+        },
+        {
+            name: 'Defender Module Spares Kit',
+            image: 'icon.jpg',
+            partNumber: '71532',
+            specs: {
+                depthRating: 'TBD',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender module spares kit'
+            }
+        }
+    ],
+    floatation: [
+        {
+            name: 'Defender 300m Aux Float Kit - 1 kg Buoyancy',
+            image: 'Defender_300m_Aux_Float_Kit_-_1_kg_Buoyancy.jpg',
+            partNumber: '74816',
+            specs: {
+                depthRating: '300m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-1.0kg',
+                keySpec: '1 kg buoyancy, Defender 300m'
+            }
+        },
+        {
+            name: 'Defender 300m Aux Float Kit - 2 kg Buoyancy',
+            image: 'Defender_300m_Aux_Float_Kit_-_2_kg_Buoyancy.jpg',
+            partNumber: '74817',
+            specs: {
+                depthRating: '300m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-2.0kg',
+                keySpec: '2 kg buoyancy, Defender 300m'
+            }
+        },
+        {
+            name: 'Defender 300m Aux Float Kit - 3 kg Buoyancy',
+            image: 'Defender_300m_Aux_Float_Kit_-_3_kg_Buoyancy.jpg',
+            partNumber: '74818',
+            specs: {
+                depthRating: '300m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-3.0kg',
+                keySpec: '3 kg buoyancy, Defender 300m'
+            }
+        },
+        {
+            name: 'Defender 2km Aux Float Kit - 1 kg Buoyancy',
+            image: 'Defender_2km_Aux_Float_Kit_-_1_kg_Buoyancy.jpg',
+            partNumber: '74819',
+            specs: {
+                depthRating: '2000m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-1.0kg',
+                keySpec: '1 kg buoyancy, Defender 2km'
+            }
+        },
+        {
+            name: 'Defender 2km Aux Float Kit - 2 kg Buoyancy',
+            image: 'Defender_2km_Aux_Float_Kit_-_2_kg_Buoyancy.jpg',
+            partNumber: '74820',
+            specs: {
+                depthRating: '2000m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-2.0kg',
+                keySpec: '2 kg buoyancy, Defender 2km'
+            }
+        },
+        {
+            name: 'Defender 2km Aux Float Kit - 3 kg Buoyancy',
+            image: 'Defender_2km_Aux_Float_Kit_-_3_kg_Buoyancy.jpg',
+            partNumber: '74821',
+            specs: {
+                depthRating: '2000m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: '-3.0kg',
+                keySpec: '3 kg buoyancy, Defender 2km'
+            }
+        },
+        {
+            name: 'Defender Float Block 2km',
+            image: 'Defender_Float_Block_2km.jpg',
+            partNumber: '71028',
+            specs: {
+                depthRating: '2000m',
+                communication: 'N/A',
+                dryWeight: 'TBD',
+                wetWeight: 'TBD',
+                keySpec: 'Defender 2km float block'
+            }
+        }
+    ]
+};
+
+
+        let bom = [];
+        let selectedBaseModel = null;
+        let selectedController = null;
+        let selectedBattery = null;
+        let selectedTether = null;
+        let currentAccessoryForModal = null;
+        let currentCategory = null;
+
+        // Initialize grids
+        function initializeGrids() {
+            initializeCategory('manipulatorGrid', accessories.manipulators, 'Manipulators');
+            initializeCategory('sonarGrid', accessories.sonars, 'Sonars');
+            initializeCategory('cameraGrid', accessories.cameras, 'Cameras');
+            initializeCategory('navigationGrid', accessories.navigation, 'Navigation');
+            initializeCategory('ndtGrid', accessories.ndt, 'NDT');
+            initializeCategory('eodGrid', accessories.eod, 'EOD');
+            initializeCategory('uncategorizedGrid', accessories.uncategorized, 'Uncategorized');
+            initializeCategory('floatationGrid', accessories.floatation, 'Floatation');
+        }
+
+        function initializeCategory(gridId, items, category) {
+            const grid = document.getElementById(gridId);
+            items.forEach(item => {
+                const hasOptions = '';
+                grid.innerHTML += `
+                    <div class="item-card" onclick='handleAccessoryClick(${JSON.stringify(item).replace(/'/g, "\\'")},"${category}")'>
+                        <img src="images/${item.image}" alt="${item.name}" onerror="this.src='images/icon.jpg'">
+                        <h3>${item.name}${hasOptions}</h3>
+                        <p>${item.partNumber}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function selectBaseModel(element) {
+            document.querySelectorAll('#baseModelGrid .item-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedBaseModel = element.dataset.model;
+            updateBOM();
+        }
+
+        function selectController(element) {
+            document.querySelectorAll('#controllerGrid .item-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedController = element.dataset.controller;
+            updateBOM();
+        }
+
+        function selectBattery(element) {
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedBattery = null;
+            } else {
+                document.querySelectorAll('#batteryGrid .item-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                element.classList.add('selected');
+                selectedBattery = {
+                    name: element.dataset.battery,
+                    partNumber: element.dataset.pn
+                };
+            }
+            updateBOM();
+        }
+
+        function selectSoftware(element) {
+            document.querySelectorAll('#softwareGrid .item-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            document.getElementById('software').value = element.dataset.software;
+            updateBOM();
+        }
+
+        function selectTether(element) {
+            document.querySelectorAll('#tetherGrid .item-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedTether = element.dataset.tether;
+            updateBOM();
+        }
+
+        function handleAccessoryClick(item, category) {
+            if (item.hasDepthOptions) {
+                showDepthOptionsModal(item, category);
+            } else {
+                showSpecModal(item, category);
+            }
+        }
+
+        function showDepthOptionsModal(item, category) {
+            const modal = document.getElementById('depthModal');
+            const message = document.getElementById('modalMessage');
+            const option1Btn = document.getElementById('option1Btn');
+            const option2Btn = document.getElementById('option2Btn');
+
+            message.textContent = `Select depth rating for ${item.name}:`;
+            option1Btn.textContent = item.options[0].depth;
+            option2Btn.textContent = item.options[1].depth;
+
+            option1Btn.onclick = () => {
+                const itemWithDepth = {...item, ...item.options[0], name: `${item.name} (${item.options[0].depth})`};
+                closeDepthModal();
+                showSpecModal(itemWithDepth, category);
+            };
+            option2Btn.onclick = () => {
+                const itemWithDepth = {...item, ...item.options[1], name: `${item.name} (${item.options[1].depth})`};
+                closeDepthModal();
+                showSpecModal(itemWithDepth, category);
+            };
+
+            modal.classList.add('active');
+        }
+
+        function closeDepthModal() {
+            document.getElementById('depthModal').classList.remove('active');
+        }
+
+        function showSpecModal(item, category) {
+            currentAccessoryForModal = item;
+            currentCategory = category;
+
+            const modal = document.getElementById('specModal');
+            const title = document.getElementById('specModalTitle');
+            const table = document.getElementById('specTable');
+
+            title.textContent = `${item.name} - Specifications`;
+
+            // Clear existing rows except header
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            // Add spec rows
+            const specs = item.specs;
+            addSpecRow(table, 'Part Number', item.partNumber);
+            addSpecRow(table, 'Depth Rating', specs.depthRating);
+            addSpecRow(table, 'Communication', specs.communication);
+            addSpecRow(table, 'Dry Weight', specs.dryWeight);
+            addSpecRow(table, 'Wet Weight', specs.wetWeight);
+            addSpecRow(table, 'Key Specification', specs.keySpec);
+
+            modal.classList.add('active');
+        }
+
+        function addSpecRow(table, label, value) {
+            const row = table.insertRow(-1);
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.textContent = label;
+            cell2.textContent = value;
+        }
+
+        function closeSpecModal() {
+            document.getElementById('specModal').classList.remove('active');
+            currentAccessoryForModal = null;
+            currentCategory = null;
+        }
+
+        function addToBOMFromModal() {
+            if (!currentAccessoryForModal) return;
+
+            const existingIndex = bom.findIndex(bomItem => 
+                bomItem.name === currentAccessoryForModal.name
+            );
+
+            if (existingIndex !== -1) {
+                alert('This item is already in the BOM!');
+                return;
+            }
+
+            bom.push({
+                name: currentAccessoryForModal.name,
+                partNumber: currentAccessoryForModal.partNumber,
+                category: currentCategory,
+                specs: currentAccessoryForModal.specs,
+                isUSBL: currentAccessoryForModal.isUSBL || false,
+                quantity: 1
+            });
+
+            // Highlight the selected accessory card
+            highlightAccessoryCards();
+
+            checkSpecialRules(currentAccessoryForModal);
+            updateBOM();
+            closeSpecModal();
+        }
+
+        function checkSpecialRules(item) {
+            // Ethernet hub logic
+            updateEthernetHubLogic();
+
+            // Voyis Stereo Camera logic (keep if you have one)
+            if (item.name && item.name.includes('Voyis') && item.name.includes('Stereo')) {
+                addAutomaticItem({
+                    name: '16-to-13 Pin Cable (for Voyis Stereo)',
+                    partNumber: 'PN-CABLE-001',
+                    category: 'Cables',
+                    specs: {
+                        depthRating: 'N/A',
+                        communication: 'N/A',
+                        dryWeight: '0.1kg',
+                        wetWeight: '0.1kg',
+                        keySpec: 'Voyis Stereo connection'
+                    },
+                    quantity: 1
+                });
+
+                addAutomaticItem({
+                    name: 'GigE Hub (for Voyis Stereo)',
+                    partNumber: 'PN-HUB-001',
+                    category: 'Hubs',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet (1000Mbps GigE)',
+                        dryWeight: '0.5kg',
+                        wetWeight: '0.5kg',
+                        keySpec: 'Gigabit Ethernet Hub'
+                    },
+                    quantity: 1
+                });
+
+                if (selectedTether && (selectedTether.includes('Copper') || selectedTether === 'Hybrid')) {
+                    showTetherReplacementModal();
+                } else if (!selectedTether || selectedTether !== 'Fiber') {
+                    selectedTether = 'Fiber';
+                    document.querySelectorAll('#tetherGrid .item-card').forEach(card => {
+                        card.classList.remove('selected');
+                        if (card.dataset.tether === 'Fiber') {
+                            card.classList.add('selected');
+                        }
+                    });
+                }
+            }
+        }
+
+        function updateEthernetHubLogic() {
+            const ethernetDevices = bom.filter(item => 
+                item.specs && item.specs.communication && item.specs.communication.includes('Ethernet') && item.category !== 'Hubs' && item.category !== 'Converters'
+            );
+            const ethernetCount = ethernetDevices.length;
+
+            // Remove existing ethernet hubs and converters
+            bom = bom.filter(item => 
+                !item.name.includes('Ethernet Hub') && !item.name.includes('2-1 Ethernet') && !item.name.includes('Ethernet to Serial Converter')
+            );
+
+            if (ethernetCount > 3 && ethernetCount <= 5) {
+                const hubsNeeded = ethernetCount - 3;
+                addAutomaticItem({
+                    name: '2-1 Ethernet Hub Cable',
+                    partNumber: 'PN-HUB-2-1',
+                    category: 'Hubs',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.2kg',
+                        wetWeight: '0.2kg',
+                        keySpec: '2-to-1 Ethernet splitter'
+                    },
+                    quantity: hubsNeeded
+                });
+            } else if (ethernetCount > 5) {
+                addAutomaticItem({
+                    name: '4-Port Ethernet Hub',
+                    partNumber: 'PN-HUB-4PORT',
+                    category: 'Hubs',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet',
+                        dryWeight: '0.8kg',
+                        wetWeight: '0.8kg',
+                        keySpec: '4-port Ethernet hub'
+                    },
+                    quantity: 1
+                });
+            }
+
+            // Check for GigE devices
+            const gigeDevices = bom.filter(item => 
+                item.specs && item.specs.communication && (item.specs.communication.includes('GigE') || item.name.includes('Voyis'))
+            );
+
+            if (gigeDevices.length > 0) {
+                const existingGigeHub = bom.find(item => item.name.includes('GigE Hub'));
+                if (!existingGigeHub) {
+                    addAutomaticItem({
+                        name: 'GigE Hub',
+                        partNumber: 'PN-HUB-GIGE',
+                        category: 'Hubs',
+                        specs: {
+                            depthRating: '1000m',
+                            communication: 'Ethernet (1000Mbps GigE)',
+                            dryWeight: '0.5kg',
+                            wetWeight: '0.5kg',
+                            keySpec: 'Gigabit Ethernet Hub'
+                        },
+                        quantity: 1
+                    });
+                }
+            }
+
+            // Serial device logic: add 1 Ethernet to Serial Converter per serial device (excluding USBL)
+            const serialDevices = bom.filter(item => 
+                item.specs && item.specs.communication && 
+                (item.specs.communication.includes('RS') || item.specs.communication.includes('Serial')) &&
+                !item.specs.communication.includes('Power Only') &&
+                !item.isUSBL &&
+                item.category !== 'Hubs' && item.category !== 'Converters'
+            );
+            const serialCount = serialDevices.length;
+
+            if (serialCount > 0) {
+                addAutomaticItem({
+                    name: 'Ethernet to Serial Converter',
+                    partNumber: 'PN-CONV-ETH-SER',
+                    category: 'Converters',
+                    specs: {
+                        depthRating: '1000m',
+                        communication: 'Ethernet / RS232 / RS485',
+                        dryWeight: 'TBD',
+                        wetWeight: 'TBD',
+                        keySpec: 'Ethernet to Serial converter'
+                    },
+                    quantity: serialCount
+                });
+            }
+        }
+
+        function addAutomaticItem(item) {
+            const existingIndex = bom.findIndex(bomItem => 
+                bomItem.name === item.name && bomItem.category === item.category
+            );
+
+            if (existingIndex !== -1) {
+                bom[existingIndex].quantity = item.quantity;
+            } else {
+                bom.push(item);
+            }
+        }
+
+        function showTetherReplacementModal() {
+            document.getElementById('tetherModal').classList.add('active');
+        }
+
+        function closeTetherModal() {
+            document.getElementById('tetherModal').classList.remove('active');
+        }
+
+        function replaceTether() {
+            selectedTether = 'Fiber';
+            document.querySelectorAll('#tetherGrid .item-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.tether === 'Fiber') {
+                    card.classList.add('selected');
+                }
+            });
+            updateBOM();
+            closeTetherModal();
+        }
+
+        function addFiberTether() {
+            updateBOM();
+            closeTetherModal();
+        }
+
+        function removeFromBOM(index) {
+            bom.splice(index, 1);
+            updateEthernetHubLogic();
+            highlightAccessoryCards();
+            updateBOM();
+        }
+
+        function highlightAccessoryCards() {
+            // Get all accessory grid cards
+            const grids = ['manipulatorGrid', 'sonarGrid', 'cameraGrid', 'navigationGrid', 'ndtGrid', 'eodGrid', 'uncategorizedGrid', 'floatationGrid'];
+            grids.forEach(gridId => {
+                const grid = document.getElementById(gridId);
+                if (!grid) return;
+                grid.querySelectorAll('.item-card').forEach(card => {
+                    const cardName = card.querySelector('h3').textContent.replace(/\s*\*$/, '');
+                    const inBOM = bom.some(bomItem => bomItem.name.startsWith(cardName));
+                    if (inBOM) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            });
+        }
+
+        function updateBOM() {
+            const bomList = document.getElementById('bomList');
+            bomList.innerHTML = '';
+
+            // Add base model
+            if (selectedBaseModel) {
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">Base Model: ${selectedBaseModel}</div>
+                            <div class="details">Part #: ${ {'Defender': '73421', 'Pro 5': 'PN-PRO5', 'Ally': 'PN-ALLY', 'Wraith': 'PN-WRAITH', 'Defender + Ally Combo': 'PN-DEFALLY'}[selectedBaseModel] || 'TBD' }</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add controller
+            if (selectedController) {
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">Topside Controller: ${selectedController}</div>
+                            <div class="details">Part #: ${ {'Splashproof': '73394', 'Workhorse': 'PN-WORKHORSE', 'Expeditionary': 'PN-EXPED', 'PPS': '71850'}[selectedController] || 'TBD' }</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add battery
+            if (selectedBattery) {
+                const batterySpecs = {
+                    'NiMH 300m': { depth: '300m', voltage: '48VDC', capacity: '235 Whr/battery', dry: '4.5kg/battery', wet: '1.2kg/battery' },
+                    'NiMH 1000m': { depth: '1000m', voltage: '48VDC', capacity: '235 Whr/battery', dry: '5.3kg/battery', wet: '1.8kg/battery' },
+                    'Li-Ion 300m': { depth: '300m', voltage: '48VDC', capacity: '404 Whr/battery', dry: '4.0kg/battery', wet: '0.6kg/battery' },
+                    'Li-Ion 1000m': { depth: '1000m', voltage: '48VDC', capacity: '404 Whr/battery', dry: '4.8kg/battery', wet: '1.24kg/battery' }
+                };
+                const bs = batterySpecs[selectedBattery.name];
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">Vehicle Battery Set: ${selectedBattery.name}</div>
+                            <div class="details">PN: ${selectedBattery.partNumber} | Depth: ${bs.depth} | ${bs.voltage} | ${bs.capacity} | Dry: ${bs.dry} | Wet: ${bs.wet}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add software
+            const software = document.getElementById('software').value;
+            if (software) {
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">Control Software: ${software}</div>
+                            <div class="details">Part #: PN-SW-${software.toUpperCase()}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add tether
+            if (selectedTether) {
+                const tetherLengthSelect = document.getElementById('tetherLength').value;
+                const customLength = document.getElementById('customTetherLength').value;
+                const tetherLength = tetherLengthSelect === 'Custom' && customLength ? `Custom: ${customLength}` : (tetherLengthSelect && tetherLengthSelect !== 'Custom' ? tetherLengthSelect : '');
+                const lengthText = tetherLength ? ` - ${tetherLength}` : '';
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">Tether: ${selectedTether}${lengthText}</div>
+                            <div class="details">Part #: ${ (function(){ if (selectedTether === 'PPT Copper') { var len = document.getElementById('tetherLength').value; if (len === '100m (Copper)') return '72036'; if (len === '300m (Copper)') return '71997'; return 'PN-PPT'; } return {'Extended TDS': '70452', 'Fiber': 'PN-FIBER', 'Hybrid': 'PN-HYBRID', 'Expeditionary Tether Reel + 550m 2 Wire Copper': '72743', 'Negative Tether': 'PN-NEGTETHER', 'Tether Bag Backpack': '50240'}[selectedTether] || 'TBD'; })() }</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add accessories
+            bom.forEach((item, index) => {
+                const isAuto = item.category === 'Cables' || item.category === 'Hubs' || item.category === 'Converters';
+                const specs = item.specs;
+                bomList.innerHTML += `
+                    <div class="bom-item">
+                        <div>
+                            <div class="name">${item.name} ${item.quantity > 1 ? '(x' + item.quantity + ')' : ''}</div>
+                            <div class="details">
+                                PN: ${item.partNumber} | 
+                                Depth: ${specs.depthRating} | 
+                                Comm: ${specs.communication} | 
+                                Dry: ${specs.dryWeight} | 
+                                Wet: ${specs.wetWeight}
+                            </div>
+                        </div>
+                        ${!isAuto ? 
+                            `<button class="remove-btn" onclick="removeFromBOM(${index})">Remove</button>` : 
+                            '<span style="color: #10b981; font-size: 0.9em;">(Auto)</span>'
+                        }
+                    </div>
+                `;
+            });
+        }
+
+        function exportToExcel() {
+            if (!selectedBaseModel) {
+                alert('Please select a base model first!');
+                return;
+            }
+
+            const exportData = [];
+            let itemNo = 1;
+            
+            // Add base model
+            exportData.push({
+                'Item No.': itemNo++,
+                'Part Number': {'Defender': '73421', 'Pro 5': 'PN-PRO5', 'Ally': 'PN-ALLY', 'Wraith': 'PN-WRAITH', 'Defender + Ally Combo': 'PN-DEFALLY'}[selectedBaseModel] || `PN-BASE-${selectedBaseModel.replace(' ', '')}`,
+                'Description': `Base Model: ${selectedBaseModel}`,
+                'Quantity': 1,
+                'Depth Rating': 'N/A',
+                'Communication': 'N/A',
+                'Dry Weight': 'TBD',
+                'Wet Weight': 'TBD',
+                'Key Specification': 'Base UUV platform'
+            });
+
+            // Add controller
+            if (selectedController) {
+                exportData.push({
+                    'Item No.': itemNo++,
+                    'Part Number': {'Splashproof': '73394', 'Workhorse': 'PN-WORKHORSE', 'Expeditionary': 'PN-EXPED', 'PPS': '71850'}[selectedController] || `PN-CTRL-${selectedController.toUpperCase()}`,
+                    'Description': `Topside Controller: ${selectedController}`,
+                    'Quantity': 1,
+                    'Depth Rating': 'N/A',
+                    'Communication': 'N/A',
+                    'Dry Weight': 'TBD',
+                    'Wet Weight': 'TBD',
+                    'Key Specification': 'Topside control unit'
+                });
+            }
+
+            // Add battery
+            if (selectedBattery) {
+                const batteryExportSpecs = {
+                    'NiMH 300m': { depth: '300m', capacity: '235 Whr/battery', dry: '4.5kg/battery', wet: '1.2kg/battery' },
+                    'NiMH 1000m': { depth: '1000m', capacity: '235 Whr/battery', dry: '5.3kg/battery', wet: '1.8kg/battery' },
+                    'Li-Ion 300m': { depth: '300m', capacity: '404 Whr/battery', dry: '4.0kg/battery', wet: '0.6kg/battery' },
+                    'Li-Ion 1000m': { depth: '1000m', capacity: '404 Whr/battery', dry: '4.8kg/battery', wet: '1.24kg/battery' }
+                };
+                const bes = batteryExportSpecs[selectedBattery.name];
+                exportData.push({
+                    'Item No.': itemNo++,
+                    'Part Number': selectedBattery.partNumber,
+                    'Description': `Vehicle Battery Set: ${selectedBattery.name}`,
+                    'Quantity': 1,
+                    'Depth Rating': bes.depth,
+                    'Communication': 'N/A',
+                    'Dry Weight': bes.dry,
+                    'Wet Weight': bes.wet,
+                    'Key Specification': `48VDC, ${bes.capacity}`
+                });
+            }
+
+            // Add software
+            const software = document.getElementById('software').value;
+            if (software) {
+                exportData.push({
+                    'Item No.': itemNo++,
+                    'Part Number': `PN-SW-${software.toUpperCase()}`,
+                    'Description': `Control Software: ${software}`,
+                    'Quantity': 1,
+                    'Depth Rating': 'N/A',
+                    'Communication': 'N/A',
+                    'Dry Weight': 'N/A',
+                    'Wet Weight': 'N/A',
+                    'Key Specification': 'Control software license'
+                });
+            }
+
+            // Add tether
+            if (selectedTether) {
+                const tetherLengthSelect = document.getElementById('tetherLength').value;
+                const customLength = document.getElementById('customTetherLength').value;
+                const tetherLength = tetherLengthSelect === 'Custom' && customLength ? `Custom: ${customLength}` : (tetherLengthSelect && tetherLengthSelect !== 'Custom' ? tetherLengthSelect : '');
+                const lengthText = tetherLength ? ` - ${tetherLength}` : '';
+                
+                // PPT Copper length-specific part numbers
+                let tetherPN = {'Extended TDS': '70452', 'Fiber': 'PN-FIBER', 'Hybrid': 'PN-HYBRID', 'PPT Copper': 'PN-PPT', 'Expeditionary Tether Reel + 550m 2 Wire Copper': '72743', 'Negative Tether': 'PN-NEGTETHER', 'Tether Bag Backpack': '50240'}[selectedTether] || 'TBD';
+                if (selectedTether === 'PPT Copper' && tetherLengthSelect === '100m (Copper)') tetherPN = '72036';
+                if (selectedTether === 'PPT Copper' && tetherLengthSelect === '300m (Copper)') tetherPN = '71997';
+                
+                exportData.push({
+                    'Item No.': itemNo++,
+                    'Part Number': tetherPN,
+                    'Description': `Tether: ${selectedTether}${lengthText}`,
+                    'Quantity': 1,
+                    'Depth Rating': 'TBD',
+                    'Communication': 'N/A',
+                    'Dry Weight': 'TBD',
+                    'Wet Weight': 'TBD',
+                    'Key Specification': tetherLength ? tetherLength : 'UUV tether cable'
+                });
+            }
+
+            // Add accessories
+            bom.forEach(item => {
+                exportData.push({
+                    'Item No.': itemNo++,
+                    'Part Number': item.partNumber,
+                    'Description': item.name,
+                    'Quantity': item.quantity,
+                    'Depth Rating': item.specs.depthRating,
+                    'Communication': item.specs.communication,
+                    'Dry Weight': item.specs.dryWeight,
+                    'Wet Weight': item.specs.wetWeight,
+                    'Key Specification': item.specs.keySpec
+                });
+            });
+
+            // Build styled worksheet using xlsx-js-style
+            const headers = ['Item No.', 'Part Number', 'Description', 'Quantity', 'Depth Rating', 'Communication', 'Dry Weight', 'Wet Weight', 'Key Specification'];
+            
+            const borderStyle = { style: 'thin', color: { rgb: '000000' } };
+            const border = { top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle };
+            
+            // Header style
+            const headerStyle = {
+                font: { bold: true },
+                fill: { fgColor: { rgb: 'D9D9D9' } },
+                border: border
+            };
+            
+            // Data cell style
+            const cellStyle = {
+                border: border
+            };
+
+            // Build array of arrays with styles
+            const aoa = [];
+            
+            // Header row
+            aoa.push(headers.map(h => ({ v: h, t: 's', s: headerStyle })));
+            
+            // Data rows
+            exportData.forEach(row => {
+                aoa.push(headers.map(h => {
+                    const val = row[h] !== undefined ? row[h] : '';
+                    return { v: val, t: typeof val === 'number' ? 'n' : 's', s: cellStyle };
+                }));
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'BOM');
+
+            // Auto-size columns
+            ws['!cols'] = [
+                { wch: 10 },  // Item No.
+                { wch: 20 },  // Part Number
+                { wch: 40 },  // Description
+                { wch: 10 },  // Quantity
+                { wch: 15 },  // Depth Rating
+                { wch: 25 },  // Communication
+                { wch: 15 },  // Dry Weight
+                { wch: 15 },  // Wet Weight
+                { wch: 30 }   // Key Specification
+            ];
+
+            // Export as proper .xlsx
+            XLSX.writeFile(wb, 'UUV_BOM.xlsx');
+        }
+
+        // Initialize on page load
+        initializeGrids();
+
+        // Tether length dropdown - show/hide custom input
+        document.getElementById('tetherLength').addEventListener('change', function() {
+            const customGroup = document.getElementById('customLengthGroup');
+            if (this.value === 'Custom') {
+                customGroup.style.display = 'block';
+                document.getElementById('customTetherLength').focus();
+            } else {
+                customGroup.style.display = 'none';
+                document.getElementById('customTetherLength').value = '';
+                updateBOM();
+            }
+        });
+
+        function updateCustomTetherLength() {
+            updateBOM();
+        }
+
+    </script>
+</body>
+</html>
